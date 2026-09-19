@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Encuesta de satisfacción — servicio semanal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --forest:#2F4A3B;
+    --forest-dark:#20332A;
+    --sage-bg:#F3F1E6;
+    --gold:#C98A1B;
+    --gold-dark:#A66F12;
+    --coral:#B23A2E;
+    --ink:#2A2A24;
+    --ink-soft:#5B5B50;
+    --line: rgba(42,42,36,0.14);
+    --card:#FFFFFF;
+    --radius:18px;
+    --star-fill:#D79A2C;
+    --star-empty: rgba(42,42,36,0.18);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --forest:#7FB08E;
+      --forest-dark:#A9D0B4;
+      --sage-bg:#1B1E19;
+      --gold:#E3A63E;
+      --gold-dark:#F0BE66;
+      --coral:#E2685A;
+      --ink:#EDEAE0;
+      --ink-soft:#B4B0A2;
+      --line: rgba(237,234,224,0.16);
+      --card:#242821;
+      --star-fill:#E3A63E;
+      --star-empty: rgba(237,234,224,0.2);
+    }
+  }
+  :root[data-theme="dark"]{
+    --forest:#7FB08E;
+    --forest-dark:#A9D0B4;
+    --sage-bg:#1B1E19;
+    --gold:#E3A63E;
+    --gold-dark:#F0BE66;
+    --coral:#E2685A;
+    --ink:#EDEAE0;
+    --ink-soft:#B4B0A2;
+    --line: rgba(237,234,224,0.16);
+    --card:#242821;
+    --star-fill:#E3A63E;
+    --star-empty: rgba(237,234,224,0.2);
+  }
+  *{ box-sizing:border-box; }
+  html,body{ margin:0; padding:0; }
+  body{
+    font-family:'Inter', system-ui, -apple-system, sans-serif;
+    color:var(--ink);
+    background:
+      radial-gradient(circle at 1px 1px, rgba(47,74,59,0.08) 1px, transparent 0) 0 0/22px 22px,
+      var(--sage-bg);
+    min-height:100vh;
+    display:flex;
+    align-items:flex-start;
+    justify-content:center;
+    padding:28px 14px 60px;
+  }
+  h1,h2,h3{ font-family:'Fraunces', Georgia, serif; font-weight:600; color:var(--forest-dark); margin:0; }
+  .app{ width:100%; max-width:520px; }
+  .brand{ text-align:center; margin-bottom:18px; }
+  .brand .eyebrow{ font-size:13px; color:var(--gold-dark); font-weight:600; margin-bottom:4px; }
+  .brand h1{ font-size:25px; line-height:1.18; }
+  .brand p{ margin:6px 0 0; color:var(--ink-soft); font-size:14.5px; }
+  .brand .semana-tag{
+    display:inline-block; margin-top:10px; padding:6px 14px; border-radius:99px;
+    background:var(--card); border:1px solid var(--line); font-size:12.8px; color:var(--forest-dark); font-weight:600;
+  }
+
+  .progress-wrap{ margin: 20px 0 14px; }
+  .progress-track{ height:6px; border-radius:99px; background:rgba(47,74,59,0.14); overflow:hidden; }
+  .progress-fill{ height:100%; background:linear-gradient(90deg, var(--gold), var(--forest)); border-radius:99px; transition:width .35s ease; }
+  .progress-label{ display:flex; justify-content:space-between; margin-top:6px; font-size:12.5px; color:var(--ink-soft); }
+
+  .card{ background:var(--card); border-radius:var(--radius); border:1px solid var(--line); padding:26px 22px 22px; }
+  .step{ display:none; animation:fade .28s ease; }
+  .step.active{ display:block; }
+  @keyframes fade{ from{ opacity:0; transform:translateY(6px);} to{opacity:1; transform:none;} }
+
+  .q-title{ font-size:20px; line-height:1.3; margin-bottom:4px; }
+  .q-help{ font-size:14px; color:var(--ink-soft); margin:6px 0 18px; }
+
+  label.field-label{ display:block; font-size:13.5px; font-weight:600; color:var(--forest-dark); margin:14px 0 6px; }
+  input[type=text], input[type=tel], textarea{
+    width:100%; font-family:'Inter',sans-serif; font-size:15.5px;
+    padding:12px 14px; border-radius:12px; border:1.5px solid var(--line);
+    background:var(--sage-bg); color:var(--ink); outline:none;
+  }
+  input:focus, textarea:focus{ border-color:var(--gold); }
+  textarea{ min-height:80px; resize:vertical; }
+
+  .choice-grid{ display:grid; gap:10px; margin-top:4px; }
+  .choice{
+    border:1.5px solid var(--line); border-radius:14px; background:var(--sage-bg);
+    padding:13px 14px; text-align:left; cursor:pointer;
+    font-family:'Inter',sans-serif; color:var(--ink);
+    transition:border-color .15s, background .15s;
+    display:flex; align-items:center; gap:10px;
+  }
+  .choice:hover{ border-color:var(--gold); }
+  .choice .c-emoji{ font-size:20px; }
+  .choice .c-title{ font-weight:700; font-size:15px; }
+  .choice .c-sub{ font-size:12.6px; color:var(--ink-soft); margin-top:1px; }
+  .choice.selected{ border-color:var(--forest); background:rgba(47,74,59,0.09); }
+  .choice.selected .c-title{ color:var(--forest-dark); }
+
+  .dia-group{ margin-bottom:6px; }
+  .dia-label{
+    font-size:12.5px; font-weight:700; letter-spacing:.03em; text-transform:uppercase;
+    color:var(--gold-dark); margin:18px 0 8px;
+  }
+  .dia-label:first-child{ margin-top:0; }
+  .plato-row{
+    border:1.5px solid var(--line); border-radius:14px; background:var(--sage-bg);
+    padding:12px 14px; margin-bottom:8px;
+  }
+  .plato-row.noprobado{ opacity:.55; }
+  .plato-top{ display:flex; justify-content:space-between; align-items:flex-start; gap:10px; }
+  .plato-nombre{ font-size:14.5px; font-weight:600; line-height:1.3; }
+  .plato-tipo{ font-size:11.5px; color:var(--ink-soft); margin-top:1px; }
+  .no-probe-btn{
+    flex-shrink:0; font-size:11.5px; font-weight:600; color:var(--ink-soft);
+    background:transparent; border:1.5px solid var(--line); border-radius:99px;
+    padding:5px 10px; cursor:pointer; white-space:nowrap;
+  }
+  .no-probe-btn.active{ border-color:var(--coral); color:var(--coral); background:rgba(178,58,46,0.08); }
+
+  .star-row{ display:flex; gap:4px; margin-top:9px; }
+  .star-btn{
+    background:none; border:none; cursor:pointer; font-size:22px; line-height:1; padding:2px;
+    color:var(--star-empty);
+  }
+  .star-btn.filled{ color:var(--star-fill); }
+  .star-row.disabled .star-btn{ pointer-events:none; opacity:.4; }
+
+  .aspecto-row{ padding:11px 2px; border-bottom:1px solid var(--line); }
+  .aspecto-row:last-child{ border-bottom:none; }
+  .aspecto-row .a-name{ font-size:14.5px; font-weight:500; }
+
+  .chip-row{ display:flex; flex-wrap:wrap; gap:8px; margin-top:6px; }
+  .chip{
+    border:1.5px solid var(--line); border-radius:99px; padding:8px 14px;
+    font-size:13.6px; background:var(--sage-bg); cursor:pointer; color:var(--ink);
+  }
+  .chip.selected{ border-color:var(--forest); background:rgba(47,74,59,0.1); color:var(--forest-dark); font-weight:600; }
+
+  .nps-wrap{ margin-top:6px; }
+  .nps-grid{ display:flex; flex-wrap:wrap; gap:6px; }
+  .nps-btn{
+    width:38px; height:38px; border-radius:10px; border:1.5px solid var(--line);
+    background:var(--sage-bg); cursor:pointer; font-size:14px; font-weight:600; color:var(--ink);
+  }
+  .nps-btn.selected{ background:var(--forest); border-color:var(--forest); color:#fff; }
+  .nps-scale-labels{ display:flex; justify-content:space-between; margin-top:6px; font-size:11.5px; color:var(--ink-soft); }
+
+  .nav-row{ display:flex; justify-content:space-between; align-items:center; margin-top:24px; }
+  button.btn{ font-family:'Inter',sans-serif; font-weight:600; font-size:15px; padding:12px 20px; border-radius:12px; border:none; cursor:pointer; }
+  .btn-primary{ background:var(--forest); color:#fff; }
+  .btn-primary:hover{ background:var(--forest-dark); }
+  .btn-primary:disabled{ background:#B9C4BC; cursor:not-allowed; }
+  .btn-ghost{ background:transparent; color:var(--ink-soft); }
+  .btn-ghost:hover{ color:var(--ink); }
+
+  .summary-box{ background:var(--sage-bg); border:1.5px solid var(--line); border-radius:14px; padding:16px; margin:16px 0; font-size:14px; }
+  .summary-box dt{ font-weight:600; color:var(--forest-dark); margin-top:10px; font-size:12.6px; }
+  .summary-box dt:first-child{ margin-top:0; }
+  .summary-box dd{ margin:2px 0 0; }
+  .summary-box dd.stars{ letter-spacing:1px; color:var(--star-fill); }
+
+  .whatsapp-btn{
+    display:flex; align-items:center; justify-content:center; gap:9px;
+    width:100%; background:#25A35A; color:#fff; padding:15px; border-radius:14px;
+    font-weight:700; font-size:15.5px; border:none; cursor:pointer;
+  }
+  .whatsapp-btn:hover{ background:#1E8C4B; }
+  .copy-btn{
+    width:100%; margin-top:10px; background:transparent; border:1.5px solid var(--line);
+    color:var(--ink-soft); padding:11px; border-radius:14px; font-size:13.6px; cursor:pointer;
+  }
+  .done-check{
+    width:56px; height:56px; border-radius:50%; background:var(--forest);
+    display:flex; align-items:center; justify-content:center; margin:0 auto 14px;
+    animation:pop .4s ease;
+  }
+  @keyframes pop{ 0%{transform:scale(0);} 70%{transform:scale(1.12);} 100%{transform:scale(1);} }
+  .foot-note{ text-align:center; font-size:12px; color:var(--ink-soft); margin-top:16px; }
+</style>
+</head>
+<body>
+
+<div class="app">
+  <div class="brand">
+    <div class="eyebrow" id="nombreServicio">Comida casera semanal</div>
+    <h1>¿Cómo estuvo tu semana de comidas?</h1>
+    <p>8 preguntas rápidas — nos ayuda a mejorar cada semana.</p>
+    <div class="semana-tag" id="semanaTag"></div>
+  </div>
+
+  <div class="progress-wrap">
+    <div class="progress-track"><div class="progress-fill" id="progressFill" style="width:12.5%"></div></div>
+    <div class="progress-label"><span id="progressText">Paso 1 de 8</span><span id="progressPct">13%</span></div>
+  </div>
+
+  <div class="card" id="card">
+
+    <!-- Step 1: identificación -->
+    <div class="step active" data-step="1">
+      <h2 class="q-title">¿Quién nos da su opinión?</h2>
+      <p class="q-help">Así podemos dar seguimiento a tu pedido si hace falta.</p>
+      <label class="field-label" for="nombre">Nombre completo</label>
+      <input type="text" id="nombre" placeholder="Ej: Andrea Solís">
+      <label class="field-label" for="telefono">Teléfono (WhatsApp)</label>
+      <input type="tel" id="telefono" placeholder="Ej: 8888 8888">
+    </div>
+
+    <!-- Step 2: satisfacción general -->
+    <div class="step" data-step="2">
+      <h2 class="q-title">En general, ¿qué tan satisfecho quedaste con la semana?</h2>
+      <p class="q-help">Tomando en cuenta todos los platos que recibiste.</p>
+      <div class="choice-grid" id="satisfaccionChoices"></div>
+    </div>
+
+    <!-- Step 3: platos de la semana (dinámico) -->
+    <div class="step" data-step="3">
+      <h2 class="q-title">Calificá los platos de esta semana</h2>
+      <p class="q-help">Si no probaste alguno, marcalo como "No lo probé" en vez de calificarlo.</p>
+      <div id="platosWrap"></div>
+    </div>
+
+    <!-- Step 4: aspectos del servicio -->
+    <div class="step" data-step="4">
+      <h2 class="q-title">Calificá estos aspectos del servicio</h2>
+      <p class="q-help">1 estrella = muy mal, 5 estrellas = excelente.</p>
+      <div id="aspectosWrap"></div>
+    </div>
+
+    <!-- Step 5: qué mejorar -->
+    <div class="step" data-step="5">
+      <h2 class="q-title">¿Qué podríamos mejorar?</h2>
+      <p class="q-help">Marcá todas las que apliquen.</p>
+      <div class="chip-row" id="mejoraChips"></div>
+      <label class="field-label" for="mejoraOtro">¿Algo más que quieras contarnos sobre esto?</label>
+      <textarea id="mejoraOtro" placeholder="Opcional"></textarea>
+    </div>
+
+    <!-- Step 6: recomendación -->
+    <div class="step" data-step="6">
+      <h2 class="q-title">¿Qué tan probable es que nos recomendés?</h2>
+      <p class="q-help">0 = nada probable, 10 = totalmente probable.</p>
+      <div class="nps-wrap">
+        <div class="nps-grid" id="npsGrid"></div>
+        <div class="nps-scale-labels"><span>Nada probable</span><span>Totalmente probable</span></div>
+      </div>
+      <label class="field-label" for="npsPor">¿Por qué esa calificación? (opcional)</label>
+      <textarea id="npsPor" placeholder="Contanos brevemente"></textarea>
+    </div>
+
+    <!-- Step 7: sugerencias -->
+    <div class="step" data-step="7">
+      <h2 class="q-title">¿Algún plato que te gustaría ver en el menú?</h2>
+      <p class="q-help">Ideas, platos favoritos que extrañás, o cualquier otro comentario.</p>
+      <textarea id="sugerencias" placeholder="Escribí aquí (opcional)"></textarea>
+    </div>
+
+    <!-- Step 8: resumen -->
+    <div class="step" data-step="8">
+      <div class="done-check">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none"><path d="M4 12.5L9.5 18L20 6" stroke="white" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <h2 class="q-title" style="text-align:center;">Listo — revisá y enviá</h2>
+      <p class="q-help" style="text-align:center;">Gracias por ayudarnos a mejorar cada semana.</p>
+      <dl class="summary-box" id="summaryBox"></dl>
+      <a class="whatsapp-btn" id="sendWhatsapp" href="#" target="_blank" rel="noopener noreferrer">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="white"><path d="M17.5 14.4c-.3-.1-1.7-.9-2-1-.3-.1-.5-.1-.7.1-.2.3-.8 1-.9 1.2-.2.2-.3.2-.6.1-.3-.1-1.3-.5-2.4-1.5-.9-.8-1.5-1.8-1.7-2.1-.2-.3 0-.5.1-.6.1-.1.3-.3.4-.5.1-.2.2-.3.3-.5.1-.2 0-.4 0-.5C10 9 9.4 7.6 9.1 7c-.2-.5-.4-.4-.6-.4h-.5c-.2 0-.5.1-.7.3-.2.3-.9 1-.9 2.3s1 2.7 1.1 2.9c.1.2 2 3 4.8 4.2.7.3 1.2.5 1.6.6.7.2 1.3.2 1.8.1.5-.1 1.7-.7 1.9-1.4.2-.7.2-1.2.2-1.4-.1-.1-.3-.2-.6-.3z"/><path d="M12 2C6.5 2 2 6.5 2 12c0 1.9.5 3.7 1.5 5.2L2 22l4.9-1.3C8.4 21.5 10.1 22 12 22c5.5 0 10-4.5 10-10S17.5 2 12 2zm0 18.2c-1.7 0-3.3-.5-4.7-1.3l-.3-.2-3 .8.8-2.9-.2-.3C3.7 15 3.2 13.5 3.2 12 3.2 7.1 7.1 3.2 12 3.2S20.8 7.1 20.8 12 16.9 20.2 12 20.2z"/></svg>
+        Enviar por WhatsApp
+      </a>
+      <button type="button" class="copy-btn" id="copyText">Copiar resumen como texto</button>
+    </div>
+
+  </div>
+
+  <div class="nav-row" id="navRow">
+    <button type="button" class="btn btn-ghost" id="btnBack">Atrás</button>
+    <button type="button" class="btn btn-primary" id="btnNext">Continuar</button>
+  </div>
+
+  <p class="foot-note">Tu opinión solo se usa para mejorar el servicio.</p>
+</div>
+
+<script>
+// ============================================================
+// ⚠️ CONFIGURACIÓN — el chef edita esta sección cada semana
+// ============================================================
+const CONFIG = {
+  // Número de WhatsApp del negocio (código de país, sin + ni espacios)
+  WHATSAPP_NUMBER: "50685601294",
+
+  // Nombre del negocio, se muestra arriba del título
+  NOMBRE_SERVICIO: "Comida casera, dos veces al día",
+
+  // Etiqueta de la semana actual — cambiarla cada vez que se reenvíe la encuesta
+  SEMANA_LABEL: "Semana del 14 de setiembre al 18 de setiembre",
+
+  // 🍽️ MENÚ DE ESTA SEMANA — este es el único bloque que normalmente
+  // hay que tocar semana a semana. Agregá o quitá platos libremente:
+  // el resto de la encuesta (paso 3) se genera solo a partir de esta lista.
+  MENU_SEMANA: [
+    { dia:"Lunes",     tipo:"Almuerzo", plato:"Arroz con pollo, frijoles y papas tostadas" },
+    { dia:"Lunes",     tipo:"Cena",     plato:"Tortitas de atún con papa y huevo + ensalada" },
+    { dia:"Martes",    tipo:"Almuerzo", plato:"Fajitas de res con arroz + ensalada" },
+    { dia:"Martes",    tipo:"Cena",     plato:"Cerdo oriental con arroz" },
+    { dia:"Miércoles", tipo:"Almuerzo", plato:"Pollo al horno con puré de papa + ensalada" },
+    { dia:"Miércoles", tipo:"Cena",     plato:"Pasta de atún" },
+  ],
+};
+
+// ============================================================
+// 🔗 Menú por link — si el chef generó esta encuesta desde el
+// Panel del chef, el menú y la semana viajan codificados en la URL
+// (después del #) y sobreescriben lo de arriba automáticamente.
+// Si no hay nada en la URL, se usa el MENU_SEMANA fijo de arriba.
+// ============================================================
+function desdeB64Unicode(str){ return decodeURIComponent(escape(atob(str))); }
+function b64UrlADecimal(s){ s = s.replace(/-/g,'+').replace(/_/g,'/'); while (s.length % 4) s += '='; return s; }
+function leerMenuDesdeLink(){
+  try{
+    const m = (window.location.hash || "").match(/d=([^&]+)/);
+    if (!m) return null;
+    const json = desdeB64Unicode(b64UrlADecimal(decodeURIComponent(m[1])));
+    const data = JSON.parse(json);
+    if (!data || !Array.isArray(data.m) || !data.m.length) return null;
+    const menu = data.m
+      .filter(x => Array.isArray(x) && x.length === 3)
+      .map(([dia,tipo,plato]) => ({ dia, tipo, plato }));
+    if (!menu.length) return null;
+    return { semana: typeof data.s === "string" ? data.s : null, menu };
+  }catch(err){ return null; }
+}
+const menuDesdeLink = leerMenuDesdeLink();
+if (menuDesdeLink){
+  CONFIG.MENU_SEMANA = menuDesdeLink.menu;
+  if (menuDesdeLink.semana) CONFIG.SEMANA_LABEL = menuDesdeLink.semana;
+}
+
+// Aspectos fijos del servicio (no dependen del menú de la semana)
+const ASPECTOS = [
+  { key:"sabor",       label:"Sabor de la comida" },
+  { key:"variedad",    label:"Variedad del menú" },
+  { key:"porciones",   label:"Tamaño de las porciones" },
+  { key:"empaque",     label:"Empaque y presentación" },
+  { key:"atencion",    label:"Atención al cliente" },
+];
+
+const MEJORA_OPTS = [
+  "Variedad de platos","Tamaño de porciones",
+  "Empaque y presentación","Atención al cliente",
+  "Precio","Opciones vegetarianas","Ninguna, todo bien",
+];
+
+const SATISFACCION_OPTS = [
+  { v:"5", emoji:"😍", title:"Excelente", sub:"Superó mis expectativas" },
+  { v:"4", emoji:"🙂", title:"Muy bien",   sub:"Cumplió lo que esperaba" },
+  { v:"3", emoji:"😐", title:"Regular",    sub:"Ni bien ni mal" },
+  { v:"2", emoji:"🙁", title:"Mal",        sub:"No cumplió lo esperado" },
+  { v:"1", emoji:"😞", title:"Muy mal",    sub:"Nada satisfecho" },
+];
+
+// La semana siempre se muestra empezando en lunes, sin importar el
+// orden en que el chef haya cargado los platos en MENU_SEMANA.
+const DIAS_ORDEN = ["Lunes","Martes","Miércoles","Jueves","Viernes","Sábado","Domingo"];
+const TIPO_ORDEN = ["Almuerzo","Cena"];
+function ordenDia(d){ const i = DIAS_ORDEN.indexOf(d); return i===-1 ? DIAS_ORDEN.length : i; }
+function ordenTipo(t){ const i = TIPO_ORDEN.indexOf(t); return i===-1 ? TIPO_ORDEN.length : i; }
+// Devuelve el menú ordenado lunes→domingo, conservando el índice original
+// (_idx) para poder leer/escribir el estado de cada plato correctamente.
+function menuOrdenado(){
+  return CONFIG.MENU_SEMANA
+    .map((p,i)=>({ ...p, _idx:i }))
+    .sort((a,b)=> ordenDia(a.dia)-ordenDia(b.dia) || ordenTipo(a.tipo)-ordenTipo(b.tipo));
+}
+
+// ============================================================
+// Estado
+// ============================================================
+const state = {
+  nombre:"", telefono:"",
+  satisfaccionGeneral:null,
+  platos: CONFIG.MENU_SEMANA.map(()=>({ rating:null, noProbado:false })),
+  aspectos: Object.fromEntries(ASPECTOS.map(a=>[a.key,null])),
+  mejoras: [],
+  mejoraOtro:"",
+  nps:null,
+  npsPor:"",
+  sugerencias:"",
+};
+
+const totalSteps = 8;
+let current = 1;
+
+document.getElementById("nombreServicio").textContent = CONFIG.NOMBRE_SERVICIO;
+document.getElementById("semanaTag").textContent = CONFIG.SEMANA_LABEL;
+
+// ---- Step 2: satisfacción general ----
+const satisfaccionWrap = document.getElementById("satisfaccionChoices");
+SATISFACCION_OPTS.forEach(o=>{
+  const b = document.createElement("button");
+  b.type="button"; b.className="choice"; b.dataset.field="satisfaccionGeneral"; b.dataset.value=o.v;
+  b.innerHTML = `<span class="c-emoji">${o.emoji}</span><span><div class="c-title">${o.title}</div><div class="c-sub">${o.sub}</div></span>`;
+  satisfaccionWrap.appendChild(b);
+});
+
+// ---- Step 3: platos de la semana (agrupados por día) ----
+const platosWrap = document.getElementById("platosWrap");
+function renderPlatosStep(){
+  platosWrap.innerHTML = "";
+  let lastDia = null;
+  menuOrdenado().forEach(p=>{
+    const i = p._idx;
+    if (p.dia !== lastDia){
+      const diaLabel = document.createElement("div");
+      diaLabel.className = "dia-label";
+      diaLabel.textContent = p.dia;
+      platosWrap.appendChild(diaLabel);
+      lastDia = p.dia;
+    }
+    const row = document.createElement("div");
+    row.className = "plato-row" + (state.platos[i].noProbado ? " noprobado" : "");
+    row.dataset.index = i;
+    row.innerHTML = `
+      <div class="plato-top">
+        <div>
+          <div class="plato-nombre">${p.plato}</div>
+          <div class="plato-tipo">${p.tipo}</div>
+        </div>
+        <button type="button" class="no-probe-btn${state.platos[i].noProbado ? " active" : ""}" data-index="${i}">No lo probé</button>
+      </div>
+      <div class="star-row${state.platos[i].noProbado ? " disabled" : ""}" data-group="plato" data-index="${i}">
+        ${[1,2,3,4,5].map(n=>`<button type="button" class="star-btn${state.platos[i].rating>=n ? " filled" : ""}" data-star="${n}">★</button>`).join("")}
+      </div>`;
+    platosWrap.appendChild(row);
+  });
+}
+renderPlatosStep();
+
+// ---- Step 4: aspectos del servicio ----
+const aspectosWrap = document.getElementById("aspectosWrap");
+ASPECTOS.forEach(a=>{
+  const row = document.createElement("div");
+  row.className = "aspecto-row";
+  row.innerHTML = `
+    <div class="a-name">${a.label}</div>
+    <div class="star-row" data-group="aspecto" data-key="${a.key}">
+      ${[1,2,3,4,5].map(n=>`<button type="button" class="star-btn" data-star="${n}">★</button>`).join("")}
+    </div>`;
+  aspectosWrap.appendChild(row);
+});
+
+// ---- Step 5: chips de mejora ----
+const mejoraWrap = document.getElementById("mejoraChips");
+MEJORA_OPTS.forEach(m=>{
+  const c = document.createElement("button");
+  c.type="button"; c.className="chip"; c.textContent=m; c.dataset.value=m;
+  mejoraWrap.appendChild(c);
+});
+
+// ---- Step 6: NPS 0-10 ----
+const npsWrap = document.getElementById("npsGrid");
+for (let n=0; n<=10; n++){
+  const b = document.createElement("button");
+  b.type="button"; b.className="nps-btn"; b.dataset.val=n; b.textContent=n;
+  npsWrap.appendChild(b);
+}
+
+// ============================================================
+// Event delegation
+// ============================================================
+document.getElementById("card").addEventListener("click", (e)=>{
+  // estrellas (platos y aspectos)
+  const starBtn = e.target.closest(".star-btn");
+  if (starBtn){
+    const row = starBtn.closest(".star-row");
+    if (row.classList.contains("disabled")) return;
+    const n = Number(starBtn.dataset.star);
+    if (row.dataset.group === "plato"){
+      const idx = Number(row.dataset.index);
+      state.platos[idx].rating = n;
+      state.platos[idx].noProbado = false;
+      row.closest(".plato-row").classList.remove("noprobado");
+      row.closest(".plato-row").querySelector(".no-probe-btn").classList.remove("active");
+    } else if (row.dataset.group === "aspecto"){
+      state.aspectos[row.dataset.key] = n;
+    }
+    row.querySelectorAll(".star-btn").forEach(b=>{
+      b.classList.toggle("filled", Number(b.dataset.star) <= n);
+    });
+    return;
+  }
+  // "no lo probé"
+  const noProbeBtn = e.target.closest(".no-probe-btn");
+  if (noProbeBtn){
+    const idx = Number(noProbeBtn.dataset.index);
+    state.platos[idx].noProbado = !state.platos[idx].noProbado;
+    if (state.platos[idx].noProbado) state.platos[idx].rating = null;
+    renderPlatosStep();
+    return;
+  }
+  // choice cards (satisfacción general)
+  const choiceBtn = e.target.closest(".choice");
+  if (choiceBtn && choiceBtn.dataset.field){
+    const field = choiceBtn.dataset.field;
+    state[field] = choiceBtn.dataset.value;
+    choiceBtn.parentElement.querySelectorAll(".choice").forEach(el=>el.classList.remove("selected"));
+    choiceBtn.classList.add("selected");
+    return;
+  }
+  // chips de mejora (multi-select)
+  const mejoraChip = e.target.closest("#mejoraChips .chip");
+  if (mejoraChip){
+    const v = mejoraChip.dataset.value;
+    const idx = state.mejoras.indexOf(v);
+    if (v === "Ninguna, todo bien"){
+      state.mejoras.length = 0;
+      mejoraWrap.querySelectorAll(".chip").forEach(c=>c.classList.remove("selected"));
+      state.mejoras.push(v);
+      mejoraChip.classList.add("selected");
+      return;
+    }
+    const noneIdx = state.mejoras.indexOf("Ninguna, todo bien");
+    if (noneIdx > -1){
+      state.mejoras.splice(noneIdx,1);
+      mejoraWrap.querySelector('[data-value="Ninguna, todo bien"]').classList.remove("selected");
+    }
+    if (idx > -1){ state.mejoras.splice(idx,1); mejoraChip.classList.remove("selected"); }
+    else{ state.mejoras.push(v); mejoraChip.classList.add("selected"); }
+    return;
+  }
+  // NPS
+  const npsBtn = e.target.closest(".nps-btn");
+  if (npsBtn){
+    state.nps = Number(npsBtn.dataset.val);
+    npsWrap.querySelectorAll(".nps-btn").forEach(b=>b.classList.remove("selected"));
+    npsBtn.classList.add("selected");
+    return;
+  }
+});
+
+// live text bindings
+["nombre","telefono","mejoraOtro","npsPor","sugerencias"].forEach(id=>{
+  document.getElementById(id).addEventListener("input", (e)=>{ state[id]=e.target.value; });
+});
+
+// ============================================================
+// Navegación
+// ============================================================
+const btnBack = document.getElementById("btnBack");
+const btnNext = document.getElementById("btnNext");
+const navRow = document.getElementById("navRow");
+
+function render(){
+  document.querySelectorAll(".step").forEach(s=>{
+    s.classList.toggle("active", Number(s.dataset.step) === current);
+  });
+  document.getElementById("progressFill").style.width = `${Math.round(current/totalSteps*100)}%`;
+  document.getElementById("progressText").textContent = `Paso ${current} de ${totalSteps}`;
+  document.getElementById("progressPct").textContent = `${Math.round(current/totalSteps*100)}%`;
+  btnBack.style.visibility = current === 1 ? "hidden" : "visible";
+  navRow.style.display = "flex";
+  if (current === totalSteps){
+    btnNext.style.display = "none";
+    buildSummary();
+  } else {
+    btnNext.style.display = "inline-block";
+    btnNext.textContent = current === totalSteps-1 ? "Ver resumen" : "Continuar";
+  }
+}
+
+btnNext.addEventListener("click", ()=>{
+  if (!validateStep(current)) return;
+  if (current < totalSteps){ current++; render(); window.scrollTo({top:0, behavior:"smooth"}); }
+});
+btnBack.addEventListener("click", ()=>{
+  if (current > 1){ current--; render(); window.scrollTo({top:0, behavior:"smooth"}); }
+});
+
+function validateStep(step){
+  if (step===1 && (!state.nombre.trim() || !state.telefono.trim())){
+    flashInvalid(["nombre","telefono"]); return false;
+  }
+  if (step===2 && !state.satisfaccionGeneral){ return false; }
+  return true;
+}
+function flashInvalid(ids){
+  ids.forEach(id=>{
+    const el = document.getElementById(id);
+    if (!el.value.trim()){
+      el.style.borderColor = "var(--coral)";
+      setTimeout(()=>{ el.style.borderColor = ""; }, 900);
+    }
+  });
+}
+
+// ============================================================
+// Resumen + WhatsApp
+// ============================================================
+function starText(n){
+  if (!n) return "—";
+  return "★".repeat(n) + "☆".repeat(5-n) + ` (${n}/5)`;
+}
+function satisfaccionLabel(v){
+  const o = SATISFACCION_OPTS.find(o=>o.v===v);
+  return o ? `${o.emoji} ${o.title}` : "—";
+}
+function npsLabel(n){
+  if (n===null || n===undefined) return "—";
+  let cat = n>=9 ? "Promotor" : n>=7 ? "Pasivo" : "Detractor";
+  return `${n}/10 (${cat})`;
+}
+function platosLines(forHtml){
+  return menuOrdenado().map(p=>{
+    const st = state.platos[p._idx];
+    const val = st.noProbado ? "No lo probó" : starText(st.rating);
+    return forHtml
+      ? `<dt>${p.dia} · ${p.tipo}</dt><dd class="stars">${p.plato} — ${val}</dd>`
+      : `${p.dia} ${p.tipo} — ${p.plato}: ${val}`;
+  });
+}
+
+function buildSummary(){
+  const box = document.getElementById("summaryBox");
+  const aspectosLines = ASPECTOS.map(a=>`<dt>${a.label}</dt><dd class="stars">${starText(state.aspectos[a.key])}</dd>`).join("");
+  const rows = [
+    `<dt>Nombre</dt><dd>${escapeHtml(state.nombre || "—")}</dd>`,
+    `<dt>Teléfono</dt><dd>${escapeHtml(state.telefono || "—")}</dd>`,
+    `<dt>Semana</dt><dd>${escapeHtml(CONFIG.SEMANA_LABEL)}</dd>`,
+    `<dt>Satisfacción general</dt><dd>${satisfaccionLabel(state.satisfaccionGeneral)}</dd>`,
+    platosLines(true).join(""),
+    aspectosLines,
+    `<dt>A mejorar</dt><dd>${escapeHtml(state.mejoras.join(", ") || "—")}</dd>`,
+    `<dt>Comentario sobre mejoras</dt><dd>${escapeHtml(state.mejoraOtro || "—")}</dd>`,
+    `<dt>Recomendación (NPS)</dt><dd>${npsLabel(state.nps)}</dd>`,
+    `<dt>Por qué</dt><dd>${escapeHtml(state.npsPor || "—")}</dd>`,
+    `<dt>Sugerencias</dt><dd>${escapeHtml(state.sugerencias || "—")}</dd>`,
+  ];
+  box.innerHTML = rows.join("");
+  document.getElementById("sendWhatsapp").href = `https://wa.me/${CONFIG.WHATSAPP_NUMBER}?text=${encodeURIComponent(buildMessage())}`;
+}
+
+function escapeHtml(s){
+  return String(s).replace(/[&<>"]/g, c=>({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;" }[c]));
+}
+
+function buildMessage(){
+  return `Hola, les dejo mi opinión de la semana 🍽️
+
+*Nombre:* ${state.nombre}
+*Teléfono:* ${state.telefono}
+*Semana:* ${CONFIG.SEMANA_LABEL}
+*Satisfacción general:* ${satisfaccionLabel(state.satisfaccionGeneral)}
+
+*Platos:*
+${platosLines(false).join("\n")}
+
+*Aspectos del servicio:*
+${ASPECTOS.map(a=>`${a.label}: ${starText(state.aspectos[a.key])}`).join("\n")}
+
+*A mejorar:* ${state.mejoras.join(", ") || "—"}
+*Comentario sobre mejoras:* ${state.mejoraOtro || "—"}
+*Recomendación (0-10):* ${npsLabel(state.nps)}
+*Por qué:* ${state.npsPor || "—"}
+*Sugerencias / platos nuevos:* ${state.sugerencias || "—"}`;
+}
+
+document.getElementById("copyText").addEventListener("click", (e)=>{
+  navigator.clipboard.writeText(buildMessage()).then(()=>{
+    const btn = e.target;
+    const original = btn.textContent;
+    btn.textContent = "Copiado ✓";
+    setTimeout(()=>{ btn.textContent = original; }, 1400);
+  });
+});
+
+render();
+</script>
+</body>
+</html>
